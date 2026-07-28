@@ -1,0 +1,34 @@
+name: Daily Weather Log
+
+on:
+  schedule:
+    - cron: "0 3 * * *"  # runs daily at 3:00 UTC (~8:30 AM IST)
+  workflow_dispatch:  # lets you trigger it manually too, from GitHub's UI
+
+jobs:
+  update-weather:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install requests python-dotenv
+
+      - name: Run weather script
+        env:
+          OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
+        run: python weather.py
+
+      - name: Commit and push updated log
+        run: |
+          git config user.name "Aravind R S"
+          git config user.email "aravind54500@gmail.com"
+          git add weather_log.csv
+          git commit -m "Update weather log" || echo "No changes to commit"
+          git push
