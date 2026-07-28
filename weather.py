@@ -1,10 +1,10 @@
 import os
 import csv
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 import requests
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv()  # reads the .env file
 
 api_key = os.getenv("OPENWEATHER_API_KEY")
 
@@ -28,7 +28,10 @@ feels_like = data["main"]["feels_like"]
 humidity = data["main"]["humidity"]
 description = data["weather"][0]["description"]
 city = data["name"]
-timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+# Always use IST, regardless of where the script runs (local PC or GitHub's UTC servers)
+IST = timezone(timedelta(hours=5, minutes=30))
+timestamp = datetime.now(IST).strftime("%Y-%m-%d %H:%M:%S")
 
 print(f"{timestamp} | {city} | {temperature}°C (feels like {feels_like}°C) | {humidity}% humidity | {description}")
 
@@ -38,7 +41,6 @@ file_exists = os.path.isfile(csv_file)
 
 with open(csv_file, mode="a", newline="") as f:
     writer = csv.writer(f)
-    # Write header only if the file is brand new
     if not file_exists:
         writer.writerow(["timestamp", "city", "temperature_c", "feels_like_c", "humidity_pct", "description"])
     writer.writerow([timestamp, city, temperature, feels_like, humidity, description])
