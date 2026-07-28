@@ -17,6 +17,5 @@ plt.legend(bbox_to_anchor=(1.05, 1), loc="upper left")
 plt.xticks(rotation=45)
 plt.tight_layout()
 plt.savefig("temperature_chart.png")
-plt.show()
 
 print("Chart saved as temperature_chart.png")

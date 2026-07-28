@@ -2,8 +2,8 @@ name: Daily Weather Log
 
 on:
   schedule:
-  - cron: "0 * * * *"  # runs at the start of every hour
-  workflow_dispatch:  # lets you trigger it manually too, from GitHub's UI
+    - cron: "0 * * * *"  # runs every hour
+  workflow_dispatch:
 
 jobs:
   update-weather:
@@ -18,17 +18,20 @@ jobs:
           python-version: "3.12"
 
       - name: Install dependencies
-        run: pip install requests python-dotenv
+        run: pip install requests python-dotenv matplotlib pandas
 
       - name: Run weather script
         env:
           OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
         run: python weather.py
 
-      - name: Commit and push updated log
+      - name: Generate chart
+        run: python chart.py
+
+      - name: Commit and push updated log and chart
         run: |
           git config user.name "Aravind R S"
           git config user.email "aravind54500@gmail.com"
-          git add weather_log.csv
-          git commit -m "Update weather log" || echo "No changes to commit"
+          git add weather_log.csv temperature_chart.png
+          git commit -m "Update weather log and chart" || echo "No changes to commit"
           git push
